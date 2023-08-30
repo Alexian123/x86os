@@ -1,19 +1,58 @@
 # NASM Notes
 
-### Basics
-
 **Read character from stdin to 'al'**
-
 ```
 mov ah, 0x0     ; wait for keypress
 int 0x16        ; BIOS interrupt
 ```
 
 **Print character from 'al' to stdout**
-
 ```
 mov ah, 0xE     ; teletype mode
 int 0x10        ; BIOS interrupt
+```
+
+**CHS address**
+- C: cylinder number (0,1,2...)
+- H: head number (0,1,2...)
+- S: sector number (1,2,3...)
+
+**Read disk**
+```
+mov [BOOT_DISK], dl   ; store boot disk number
+
+; set up stack
+xor ax, ax
+mov es, ax
+mov ds, ax
+mov bp, 0x8000
+mov sp, bp
+
+; es:bx = es*16 + bx = 0x7E00 (where to load the sectors)
+mov bx, 0x7E00
+
+; read disk
+mov ah, 2
+mov al, 1           ; number of sectors to read
+mov ch, 0           ; cylinder number
+mov cl, 2           ; sector number
+mov dh, 0           ; head number
+mov dl, [BOOT_DISK]   ; drive number
+int 0x13            ; BIOS interrupt
+
+; check CF
+jnc test_num_of_sectors_read
+push eax
+mov eax, CF_ERROR_MSG
+call print_str
+pop eax
+
+; check AL
+test_num_of_sectors_read:
+cmp al, 1
+je endless_loop
+mov eax, AL_ERROR_MSG
+call print_str
 ```
 
 <br>
@@ -34,6 +73,20 @@ print_chr:  ; print from bx
     mov ah, 0xE
     mov al, bl
     int 0x10
+    ret
+```
+
+```
+print_str:  ; ptr to string in ax
+    mov bl, [eax]
+    cmp bl, 0   ; check end of string
+    je end_print_str
+    pusha
+    call print_chr
+    popa
+    inc eax
+    jmp print_str
+end_print_str:
     ret
 ```
 
