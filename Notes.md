@@ -1,9 +1,43 @@
-    [org 0x7C00]    ; memory addressing origin
+# NASM Notes
 
-    call read_and_print_str
-    jmp $   ; loop forever
+### Basics
 
+**Read character from stdin to 'al'**
 
+```
+mov ah, 0x0     ; wait for keypress
+int 0x16        ; BIOS interrupt
+```
+
+**Print character from 'al' to stdout**
+
+```
+mov ah, 0xE     ; teletype mode
+int 0x10        ; BIOS interrupt
+```
+
+<br>
+
+### My procedures
+
+```
+read_chr:   ; store in bx
+    xor bx, bx  ; clear bx
+    mov ah, 0
+    int 0x16
+    mov bl, al
+    ret
+```
+
+```
+print_chr:  ; print from bx
+    mov ah, 0xE
+    mov al, bl
+    int 0x10
+    ret
+```
+
+```
 print_int:  ; prints integer in bx
     ; if number only has 1 digit
     cmp bx, 9
@@ -31,7 +65,9 @@ print_digits:
     jmp print_digits
 print_int_return:
     ret
-     
+```
+
+```
 read_and_print_str:   ; read enter terminated string and print it (enter inputs only CR for some reason ???)
     mov ecx, buff    ; ptr to text buffer
 loop_read_str:
@@ -56,21 +92,4 @@ loop_print_str:
     jmp loop_print_str
 exit_loop_print_str:
     ret
-    
-read_chr:   ; store in bx
-    xor bx, bx  ; clear bx
-    mov ah, 0
-    int 0x16
-    mov bl, al
-    ret
-
-print_chr:  ; print from bx
-    mov ah, 0xE
-    mov al, bl
-    int 0x10
-    ret
-    
-    buff: times 64 db 0     ; text buffer
-
-    times 510-($-$$) db 0   ; padding zeros
-    db 0x55, 0xAA           ; mark end of boot sector
+```
