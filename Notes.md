@@ -1,4 +1,17 @@
-# NASM Notes
+# Notes - x86OS
+
+### Real mode
+
+**Set memory addressing origin**
+```
+[org 0x7C00]
+```
+
+**End of boot sector**
+```
+times 510-($-$$) db 0   ; padding zeros (boot sector must be 512B)
+dw 0xAA55               ; mark end of boot sector
+```
 
 **Read character from stdin to 'al'**
 ```
@@ -55,9 +68,7 @@ mov eax, AL_ERROR_MSG
 call print_str
 ```
 
-<br>
-
-### My procedures
+**Procedures**
 
 ```
 read_chr:   ; store in bx
@@ -145,4 +156,72 @@ loop_print_str:
     jmp loop_print_str
 exit_loop_print_str:
     ret
+```
+
+<br>
+
+### Protected mode
+
+**Define GDT**
+```
+GDT_Start:
+    null_descriptor:    ; 8 null bytes
+        dd 0
+        dd 0
+    code_descriptor:
+    ; base: 0 (32 bit)
+    ; limit: 0xFFFFF
+    ; pres,priv,type: 1001
+    ; type flags: 1010
+    ; other flags: 1100
+        dw 0xFFFF       ; first 16 bits of limit
+        dw 0            ; 16 bits of base +
+        db 0            ; 8 bits of base = first 24 bits of base
+        db 0b10011010   ; pres, priv, type, type flags
+        db 0b11001111   ; other flags + last 4 bits of limit
+        db 0            ; last 8 bits of base
+    data_descriptor:
+        dw 0xFFFF
+        dw 0
+        db 0
+        db 0b10010010
+        db 0b11001111
+        db 0
+GDT_End:
+
+GDT_Descriptor:
+    dw GDT_End - GDT_Start - 1  ; size
+    dd GDT_Start                ; start
+```
+
+**Switch to protected mode**
+```
+; real mode code
+
+; calculate offsets for code and data segments
+CODE_SEG equ code_descriptor - GDT_Start
+DATA_SEG equ data_descriptor - GDT_Start
+
+cli ; disable interrupts
+lgdt [GDT_Descriptor]   ; load gdt
+
+; change last bit of cr0 to 1
+mov eax, cr0
+or eax, 1
+mov cr0, eax
+
+jmp CODE_SEG:start_protected_mode ; far jump (jump to another segment)
+```
+
+**Protected mode code**
+```
+[bits 32]
+start_protected_mode:
+```
+
+**Print character**
+```
+mov al, 'A'         ; character to print
+mov ah, 0xF0        ; bg color and text color
+mov [0xB8000], ax   ; write to video memory
 ```
