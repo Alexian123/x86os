@@ -68,6 +68,14 @@ mov eax, AL_ERROR_MSG
 call print_str
 ```
 
+**Text mode**
+```
+; clears the screen
+mov ah, 0x0
+mov al, 0x3
+int 0x10
+```
+
 **Procedures**
 
 ```
@@ -217,6 +225,17 @@ jmp CODE_SEG:start_protected_mode ; far jump (jump to another segment)
 ```
 [bits 32]
 start_protected_mode:
+; set up stack and segment registers
+mov ax, DATA_SEG
+mov ds, ax
+mov ss, ax
+mov es, ax
+mov fs, ax
+mov gs, ax
+mov ebp, 0x90000
+mov esp, ebp
+
+jmp KERNEL_LOC
 ```
 
 **Print character**
