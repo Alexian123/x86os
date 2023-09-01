@@ -244,3 +244,22 @@ mov al, 'A'         ; character to print
 mov ah, 0xF0        ; bg color and text color
 mov [0xB8000], ax   ; write to video memory
 ```
+
+**C Functions**
+```
+[global outb]
+outb:   ; void outb(unsigned short port, unsigned char val)
+    ; enter
+    push ebp
+    mov ebp, esp
+    
+    mov edx, [ebp+8]    ; first parameter (last pushed on stack)
+    mov eax, [ebp+12]   ; second parameter
+
+    out dx, al  ; write 'al' to port 'dx'
+
+    ; leave
+    mov esp, ebp
+    pop ebp
+    ret
+```

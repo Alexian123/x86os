@@ -57,7 +57,7 @@ or eax, 1
 mov cr0, eax
 jmp CODE_SEG:start_protected_mode
 
-%include 'src/realio.asm'
+%include 'src/realio.inc'
 
 GDT_Start:
     null_descriptor:
