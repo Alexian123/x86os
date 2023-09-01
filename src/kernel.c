@@ -15,8 +15,22 @@ void move_cursor(int x, int y) {
     outb(0x03D5, (unsigned char) ((pos >> 8) & 0xFF));
 }
 
+void putc(unsigned char c) {
+    static short *screen = 0xB8000;
+    *screen = 0x0F00 | c;
+    ++screen;
+}
+
+void puts(const char *str) {
+    static int cursor_x = 0;
+    while (str != 0 && *str) {
+        putc(*str);
+        ++str;
+        ++cursor_x;
+    }
+    move_cursor(cursor_x, 0);
+}
+
 void main() {
-    *(short*)0xB8000 = 0x3F00 | 'C';
-    move_cursor(0, 1);
-    *(short*)0xB8002 = 0x3F00 | 'C';
+    puts("Hello, World!");
 }
