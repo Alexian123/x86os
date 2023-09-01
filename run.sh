@@ -14,7 +14,7 @@ OS_BIN=$BIN_DIR/os.bin
 rm -rf $BIN_DIR
 mkdir -p $BIN_DIR
 
-$ASM $SRC_DIR/boot.asm -f bin -o $BIN_DIR/boot.bin
+$ASM -i src $SRC_DIR/boot.asm -f bin -o $BIN_DIR/boot.bin
 $ASM $SRC_DIR/zeroes.asm -f bin -o $BIN_DIR/zeroes.bin
 
 $ASM $SRC_DIR/kernel_entry.asm -f elf -o $BIN_DIR/kernel_entry.o

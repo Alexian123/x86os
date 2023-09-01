@@ -1,7 +1,7 @@
 [org 0x7C00]
 
 KERNEL_LOC equ 0x1000
-NUM_SECTORS equ 2    ; number of sectors to read
+NUM_SECTORS equ 20    ; number of sectors to read
 
 BOOT_DISK: db 0
 mov [BOOT_DISK], dl
@@ -40,19 +40,8 @@ call print_str
 check_fail:
 jmp $   ; endless loop
 
-print_str:  ; ptr to string in ebx
-    mov ah, 0xE
-print_str_loop:
-    mov al, [ebx]
-    cmp al, 0   ; check end of string
-    je end_print_str
-    int 0x10
-    inc ebx ; next character
-    jmp print_str_loop
-end_print_str:
-    ret
-
-check_pass: ; continue
+check_pass: 
+; continue
 
 mov ah, 0x0
 mov al, 0x3
@@ -67,6 +56,8 @@ mov eax, cr0
 or eax, 1
 mov cr0, eax
 jmp CODE_SEG:start_protected_mode
+
+%include 'src/realio.asm'
 
 GDT_Start:
     null_descriptor:
