@@ -247,7 +247,6 @@ mov [0xB8000], ax   ; write to video memory
 
 **C Functions**
 ```
-[global outb]
 outb:   ; void outb(unsigned short port, unsigned char val)
     ; enter
     push ebp
@@ -259,6 +258,20 @@ outb:   ; void outb(unsigned short port, unsigned char val)
     out dx, al  ; write 'al' to port 'dx'
 
     ; leave
+    mov esp, ebp
+    pop ebp
+    ret
+```
+
+```
+inb:    ; unsigned char inb(unsigned short port)
+    push ebp
+    mov ebp, esp
+
+    mov edx, [ebp+8]
+
+    in al, dx
+
     mov esp, ebp
     pop ebp
     ret
