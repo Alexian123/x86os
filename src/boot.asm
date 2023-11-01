@@ -83,7 +83,7 @@ GDT_Descriptor:
     dw GDT_End - GDT_Start - 1
     dd GDT_Start
 
-[bits 32]
+[BITS 32]
 start_protected_mode:
 ; set up stack and segment registers
 mov ax, DATA_SEG

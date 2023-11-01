@@ -1,8 +1,6 @@
-section .text
-    [global outb]
-    [global inb]
-
-    outb:
+SECTION .text
+    global outb
+    outb:   ; void outb(unsigned short port, unsigned char val)
         push ebp
         mov ebp, esp
         
@@ -15,7 +13,8 @@ section .text
         pop ebp
         ret
 
-    inb:
+    global inb
+    inb:    ; unsigned char inb(unsigned short port)
         push ebp
         mov ebp, esp
 

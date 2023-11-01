@@ -12,6 +12,7 @@
     typedef unsigned short int      u16;
     typedef unsigned int            u32;
     typedef unsigned long long int  u64;
+    typedef u64 size_t;
 
     // floating point numbers
     typedef float   f32;

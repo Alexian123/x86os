@@ -1,5 +1,5 @@
 #include <textio.h>
-#include <sysio.h>
+#include <sys.h>
 
 #define VIDEO_MEMORY_LOC 0xB8000
 
